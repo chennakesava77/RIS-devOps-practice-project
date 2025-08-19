@@ -1,0 +1,46 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: login to Docker Hub
+  run: |
+    echo "${{ secrets.DOCKER_TOKEN"}}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+     -----------------------USER SERVICE------------------
+
+    - name: Build User Service image:
+    working-directory: ./user-service
+    run: docker build -t ${{ secrets.DOCKER_USER }}/user-service:latest .
+
+    - name: push: User Service image:
+    run: docker push ${{ secrets.DOCKER_USER }}/user-service:latest
+
+
+
+     ----------task-service------------------
+    - name: Build Task Service image:
+    working-directory: ./task-service
+    run: docker build -t ${{ secrets.DOCKER_USER }}/task-service:latest .
+
+    - name: push: Task Service image:
+    run: docker push ${{ secrets.DOCKER_USER }}/task-service:latest
+
+    ----------gateway-service------------------
+    - name: Build Gateway Service image:
+    working-directory: ./gateway-service
+    run: docker build -t ${{ secrets.DOCKER_USER }}/gateway-service:latest .
+
+    - name: push: Gateway Service image:
+    run: docker push ${{ secrets.DOCKER_USER }}/gateway-service:latest
